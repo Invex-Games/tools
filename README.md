@@ -42,6 +42,7 @@ artclean [path] [options]
 **Options:**
 
 - `-n, --no-restore`: Skips the `dotnet restore` operation after cleaning.
+- `-v, --verbose`: Enables verbose output during the cleaning process.
 
 ---
 
