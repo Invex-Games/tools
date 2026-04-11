@@ -1,4 +1,4 @@
-﻿# DecSm.Dotnet.Tools
+﻿# Invex.Dotnet.Tools
 
 A collection of useful .NET tools for developers.
 
@@ -38,7 +38,7 @@ artclean [path] [options]
 
 ## Repository Structure
 
-- `DecSm.Tools.ArtifactClean`: Source code for the `artclean` tool.
+- `Invex.Tools.ArtifactClean`: Source code for the `artclean` tool.
 - `_atom`: The **Atom** build system project used for CI/CD and automation.
 
 ## License

@@ -57,11 +57,11 @@ jobs:
           job-runs-on: ${{ matrix.job-runs-on }}
           build-slice: ${{ matrix.job-runs-on }}
       
-      - name: Upload DecSm.Tools.ArtifactClean
+      - name: Upload Invex.Tools.ArtifactClean
         uses: actions/upload-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-${{ matrix.job-runs-on }}
-          path: "${{ github.workspace }}/.github/publish/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-${{ matrix.job-runs-on }}
+          path: "${{ github.workspace }}/.github/publish/Invex.Tools.ArtifactClean"
   
   PushToNuget:
     needs: [ Pack ]
@@ -76,23 +76,23 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-windows-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-windows-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-ubuntu-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-ubuntu-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-macos-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-macos-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
       - name: PushToNuget
         id: PushToNuget
@@ -116,23 +116,23 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-windows-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-windows-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-ubuntu-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-ubuntu-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
-      - name: Download DecSm.Tools.ArtifactClean
+      - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
-          name: DecSm.Tools.ArtifactClean-macos-latest
-          path: "${{ github.workspace }}/.github/artifacts/DecSm.Tools.ArtifactClean"
+          name: Invex.Tools.ArtifactClean-macos-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
       - name: PushToRelease
         id: PushToRelease
