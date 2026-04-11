@@ -6,11 +6,14 @@ A collection of useful .NET tools for developers.
 
 ### ArtifactClean (`artclean`)
 
-`artclean` is a high-performance, recursive cleaning tool for .NET projects. It identifies and removes `bin` and `obj` directories across your workspace to reclaim disk space or ensure a clean state for your builds. 
+`artclean` is a high-performance, recursive cleaning tool for .NET projects. It identifies and removes `bin` and `obj`
+directories across your workspace to reclaim disk space or ensure a clean state for your builds.
 
-By default, it automatically executes `dotnet restore` after cleaning to bring your projects back to a ready-to-build state.
+By default, it automatically executes `dotnet restore` after cleaning to bring your projects back to a ready-to-build
+state.
 
 #### Key Features
+
 - **Fast Recursion**: Efficiently scans directories while ignoring reparse points.
 - **Deep Clean**: Removes both `bin` and `obj` folders.
 - **Auto-Restore**: Automatically runs `dotnet restore` to minimize downtime (can be disabled).
@@ -19,20 +22,27 @@ By default, it automatically executes `dotnet restore` after cleaning to bring y
 #### Installation
 
 ```bash
-dotnet tool install --global artclean
+dotnet tool install --global Invex.Tools.ArtifactClean
 ```
 
 #### Usage
 
 ```bash
+# In the repo you want to clean
+artclean
+
+# Or specify arguments / options:
 artclean [path] [options]
 ```
 
 **Arguments:**
+
 - `path`: The root directory to begin the recursive search. [Default: current directory]
 
 **Options:**
+
 - `-n, --no-restore`: Skips the `dotnet restore` operation after cleaning.
+- `-v, --verbose`: Enables verbose output during the cleaning process.
 
 ---
 
