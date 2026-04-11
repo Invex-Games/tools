@@ -38,7 +38,7 @@ jobs:
   Pack:
     strategy:
       matrix:
-        job-runs-on: [ windows-latest, ubuntu-latest, macos-latest ]
+        job-runs-on: [ windows-latest, windows-11-arm, ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-latest ]
     runs-on: ${{ matrix.job-runs-on }}
     steps:
       
@@ -85,7 +85,25 @@ jobs:
       - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
+          name: Invex.Tools.ArtifactClean-windows-11-arm
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
           name: Invex.Tools.ArtifactClean-ubuntu-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
+          name: Invex.Tools.ArtifactClean-ubuntu-24.04-arm
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
+          name: Invex.Tools.ArtifactClean-macos-15-intel
           path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
       - name: Download Invex.Tools.ArtifactClean
@@ -125,7 +143,25 @@ jobs:
       - name: Download Invex.Tools.ArtifactClean
         uses: actions/download-artifact@v4
         with:
+          name: Invex.Tools.ArtifactClean-windows-11-arm
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
           name: Invex.Tools.ArtifactClean-ubuntu-latest
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
+          name: Invex.Tools.ArtifactClean-ubuntu-24.04-arm
+          path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
+      
+      - name: Download Invex.Tools.ArtifactClean
+        uses: actions/download-artifact@v4
+        with:
+          name: Invex.Tools.ArtifactClean-macos-15-intel
           path: "${{ github.workspace }}/.github/artifacts/Invex.Tools.ArtifactClean"
       
       - name: Download Invex.Tools.ArtifactClean

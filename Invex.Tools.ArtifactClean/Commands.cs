@@ -4,129 +4,161 @@ public sealed class Commands
 {
     private static readonly EnumerationOptions EnumerationOptions = new()
     {
+        // Handle recursion manually for better control
         RecurseSubdirectories = false,
+
+        // Skip symlinks/junctions to avoid infinite loops
         AttributesToSkip = FileAttributes.ReparsePoint,
+
+        // Continue on permission errors (handled in catch block)
         IgnoreInaccessible = true,
+
+        // Skip "." and ".." entries
         ReturnSpecialDirectories = false,
+
+        // Faster matching since we use "*" pattern (not complex wildcards)
+        MatchType = MatchType.Simple,
     };
 
     /// <summary>
-    ///     Runs 'dotnet clean', then recursively deletes 'bin' and 'obj' directories from the specified path and optionally
-    ///     restores the project.
+    ///     Runs 'dotnet clean', then recursively deletes 'bin' and 'obj' directories from the specified path, then
+    ///     optionally restores the project.
     /// </summary>
     /// <param name="path">-p, The root path to start cleaning from. [Default: Current directory]</param>
     /// <param name="noRestore">-n, If true, skips any restore operations. [Default: false]</param>
+    /// <param name="verbose">-v, If true, outputs detailed information about the cleaning process. [Default: false]</param>
     [PublicAPI]
     [Command("")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Used by ConsoleAppFramework")]
-    public void Clean([HideDefaultValue] string? path = null, bool noRestore = false)
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Required by ConsoleAppFramework")]
+    public void Clean([HideDefaultValue] string? path = null, bool noRestore = false, bool verbose = false)
     {
         path ??= Directory.GetCurrentDirectory();
 
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-            return;
-
-        DotnetClean();
-        CleanRecursive(path);
-
-        if (noRestore)
-            return;
-
-        var restoreProcessStartInfo = new ProcessStartInfo("dotnet", "restore")
         {
-            WorkingDirectory = path,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-        };
-
-        using var process = Process.Start(restoreProcessStartInfo);
-
-        if (process == null)
-        {
-            Console.Error.WriteLine("Failed to start 'dotnet restore' process.");
+            Console.Error.WriteLine($"Invalid or non-existent path: {path}");
 
             return;
         }
 
-        process.WaitForExit();
+        RunDotnetCommand("clean", path, verbose);
 
-        if (process.ExitCode == 0)
-        {
-            Console.WriteLine("'dotnet restore' completed successfully.");
-        }
-        else
-        {
-            Console.Error.WriteLine($"'dotnet restore' failed with exit code {process.ExitCode}.");
-            Console.Error.WriteLine(process.StandardError.ReadToEnd());
-        }
+        // Track deleted directories across recursive calls using ref parameter
+        var deletedDirectoryCount = 0;
+
+        CleanRecursive(path, verbose, ref deletedDirectoryCount);
+        Console.WriteLine($"Deleted {deletedDirectoryCount} 'bin' / 'obj' directories.");
+
+        if (!noRestore)
+            RunDotnetCommand("restore", path, verbose);
     }
 
-    private static void DotnetClean()
+    private static void RunDotnetCommand(string command, string path, bool verbose)
     {
-        var cleanProcessStartInfo = new ProcessStartInfo("dotnet", "clean")
+        var processStartInfo = new ProcessStartInfo("dotnet", command)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            WorkingDirectory = path,
         };
 
-        using var process = Process.Start(cleanProcessStartInfo);
+        using var process = new Process();
+        process.StartInfo = processStartInfo;
 
-        if (process == null)
+        // Always subscribe to output events, even in non-verbose mode
+        // This is required because we always call BeginOutputReadLine below
+        process.OutputDataReceived += (_, e) =>
         {
-            Console.Error.WriteLine("Failed to start 'dotnet clean' process.");
+            if (e.Data != null && verbose)
+                Console.WriteLine(e.Data);
+        };
 
-            return;
-        }
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if (e.Data != null && verbose)
+                Console.Error.WriteLine(e.Data);
+        };
+
+        process.Start();
+
+        // Should always drain output streams to prevent buffer deadlock
+        // When RedirectStandardOutput/Error = true but streams aren't consumed,
+        // the process buffer can fill and hang. BeginOutputReadLine() drains asynchronously.
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
 
         process.WaitForExit();
 
-        if (process.ExitCode == 0)
-        {
-            Console.WriteLine("'dotnet clean' completed successfully.");
-        }
-        else
-        {
-            Console.Error.WriteLine($"'dotnet clean' failed with exit code {process.ExitCode}.");
-            Console.Error.WriteLine(process.StandardError.ReadToEnd());
-        }
+        if (process.ExitCode != 0)
+            Console.Error.WriteLine($"'dotnet {command}' failed with exit code {process.ExitCode}.");
+        else if (!verbose)
+            Console.WriteLine($"'dotnet {command}' completed successfully.");
     }
 
-    private static void CleanRecursive(string path)
+    private static void CleanRecursive(string path, bool verbose, ref int deletedDirectoryCount)
     {
         try
         {
-            foreach (var directory in Directory.EnumerateDirectories(path, "*", EnumerationOptions))
+            var directories = Directory
+                .EnumerateDirectories(path, "*", EnumerationOptions)
+                .ToArray();
+
+            var directoriesToDelete = new List<string>(4);
+
+            // First pass: identify bin/obj directories
+            foreach (var directory in directories)
             {
+                // Use Span<char> to avoid string allocation when getting directory name
                 var name = Path.GetFileName(directory.AsSpan());
 
-                // Fast comparison using Span
                 if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
                     name.Equals("obj", StringComparison.OrdinalIgnoreCase))
-                    DeleteDirectory(directory);
-                else
-                    CleanRecursive(directory);
+                    directoriesToDelete.Add(directory);
             }
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            // Ignore directories that cannot be accessed
-        }
-    }
 
-    private static void DeleteDirectory(string path)
-    {
-        try
-        {
-            Directory.Delete(path, true);
-            Console.WriteLine($"Deleted: {path}");
+            // Delete bin/obj directories in parallel for better performance
+            if (directoriesToDelete.Count > 0)
+            {
+                // Use local counter for thread-safe parallel increments
+                var localDeleteCount = 0;
+
+                Parallel.ForEach(directoriesToDelete,
+                    directory =>
+                    {
+                        try
+                        {
+                            // Delete recursively (true parameter) to remove all contents
+                            Directory.Delete(directory, true);
+                            Interlocked.Increment(ref localDeleteCount);
+
+                            if (verbose)
+                                Console.WriteLine($"Deleted: {directory}");
+                        }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                        {
+                            // Always report deletion failures (unlike traversal errors, user should know)
+                            Console.Error.WriteLine($"Failed to delete {directory}: {ex.Message}");
+                        }
+                    });
+
+                // Add local count to the total
+                deletedDirectoryCount += localDeleteCount;
+            }
+
+            // Second pass: recurse into other directories (sequential to avoid race conditions)
+            // Skip if we already marked this for deletion in first pass
+            foreach (var directory in directories)
+                if (!directoriesToDelete.Contains(directory))
+                    CleanRecursive(directory, verbose, ref deletedDirectoryCount);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Console.Error.WriteLine($"Failed to delete {path}: {ex.Message}");
+            // Catch specific exceptions: permission denied, path too long, etc.
+            // Silently continue unless verbose mode (don't interrupt bulk cleaning)
+            if (verbose)
+                Console.Error.WriteLine($"Skipped inaccessible directory: {path} - {ex.Message}");
         }
     }
 }
