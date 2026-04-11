@@ -1,11 +1,9 @@
-﻿using JetBrains.Annotations;
-
-namespace Atom;
+﻿namespace Atom;
 
 [PublicAPI]
 internal interface ITargets : IDotnetPackHelper, IDotnetTestHelper, INugetHelper, IGithubReleaseHelper, ISetupBuildInfo
 {
-    static readonly string[] ToolsToPack = [Projects.DecSm_Tools_ArtifactClean.Name];
+    static readonly string[] ToolsToPack = [Projects.Invex_Tools_ArtifactClean.Name];
 
     [ParamDefinition("nuget-push-feed", "The Nuget feed to push to.")]
     string NugetFeed => GetParam(() => NugetFeed, "https://api.nuget.org/v3/index.json");

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Invex.Tools.ArtifactClean/Invex.Tools.ArtifactClean.csproj" />
+  <Project Path="_atom/_atom.csproj" />
+</Solution>

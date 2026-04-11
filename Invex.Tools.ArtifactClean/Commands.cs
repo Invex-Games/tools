@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace DecSm.Tools.ArtifactClean;
+﻿namespace Invex.Tools.ArtifactClean;
 
 public sealed class Commands
 {
@@ -13,7 +11,8 @@ public sealed class Commands
     };
 
     /// <summary>
-    ///     Cleans 'bin' and 'obj' directories recursively from the specified path, and then optionally restores the project.
+    ///     Runs 'dotnet clean', then recursively deletes 'bin' and 'obj' directories from the specified path and optionally
+    ///     restores the project.
     /// </summary>
     /// <param name="path">-p, The root path to start cleaning from. [Default: Current directory]</param>
     /// <param name="noRestore">-n, If true, skips any restore operations. [Default: false]</param>
@@ -27,6 +26,7 @@ public sealed class Commands
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
             return;
 
+        DotnetClean();
         CleanRecursive(path);
 
         if (noRestore)
@@ -59,6 +59,38 @@ public sealed class Commands
         else
         {
             Console.Error.WriteLine($"'dotnet restore' failed with exit code {process.ExitCode}.");
+            Console.Error.WriteLine(process.StandardError.ReadToEnd());
+        }
+    }
+
+    private static void DotnetClean()
+    {
+        var cleanProcessStartInfo = new ProcessStartInfo("dotnet", "clean")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        using var process = Process.Start(cleanProcessStartInfo);
+
+        if (process == null)
+        {
+            Console.Error.WriteLine("Failed to start 'dotnet clean' process.");
+
+            return;
+        }
+
+        process.WaitForExit();
+
+        if (process.ExitCode == 0)
+        {
+            Console.WriteLine("'dotnet clean' completed successfully.");
+        }
+        else
+        {
+            Console.Error.WriteLine($"'dotnet clean' failed with exit code {process.ExitCode}.");
             Console.Error.WriteLine(process.StandardError.ReadToEnd());
         }
     }
