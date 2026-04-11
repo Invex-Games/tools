@@ -7,15 +7,15 @@ registries:
 
 updates:
   - package-ecosystem: "nuget"
-    target-branch: "main"
-    directory: "/"
+    target-branch: 'main'
+    directory: '/'
     registries:
       - nuget
     groups:
       nuget-deps:
         patterns:
-          - "*"
-    open-pull-requests-limit: 10
+          - '*'
     schedule:
       interval:
         weekly
+    open-pull-requests-limit: 10
