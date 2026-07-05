@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="Invex.Tools.ArtifactClean/Invex.Tools.ArtifactClean.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/Invex.Tools.ArtifactClean/Invex.Tools.ArtifactClean.csproj" />
+  </Folder>
   <Project Path="_atom/_atom.csproj" />
 </Solution>
