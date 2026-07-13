@@ -1,0 +1,22 @@
+{
+  "api/Invex.Tools.ArtifactClean.Commands.html": {
+    "href": "api/Invex.Tools.ArtifactClean.Commands.html",
+    "title": "Class Commands | Invex .NET Tools",
+    "summary": "Class Commands Namespace Invex.Tools.ArtifactClean Assembly Invex.Tools.ArtifactClean.dll public sealed class Commands Inheritance object Commands Inherited Members object.Equals(object) object.Equals(object, object) object.GetHashCode() object.GetType() object.ReferenceEquals(object, object) object.ToString() Methods Clean(string?, bool, bool) Runs 'dotnet clean', then recursively deletes 'bin' and 'obj' directories from the specified path, then optionally restores the project. [PublicAPI] [SuppressMessage(\"Performance\", \"CA1822:Mark members as static\", Justification = \"Required by ConsoleAppFramework\")] public void Clean(string? path = null, bool noRestore = false, bool verbose = false) Parameters path string -p, The root path to start cleaning from. [Default: Current directory] noRestore bool -n, If true, skips any restore operations. [Default: false] verbose bool -v, If true, outputs detailed information about the cleaning process. [Default: false]"
+  },
+  "api/Invex.Tools.ArtifactClean.html": {
+    "href": "api/Invex.Tools.ArtifactClean.html",
+    "title": "Namespace Invex.Tools.ArtifactClean | Invex .NET Tools",
+    "summary": "Namespace Invex.Tools.ArtifactClean Classes Commands"
+  },
+  "docs/artifactclean.html": {
+    "href": "docs/artifactclean.html",
+    "title": "ArtifactClean | Invex .NET Tools",
+    "summary": "ArtifactClean (artclean) artclean recursively removes bin and obj directories from a .NET workspace. By default, it restores the workspace afterward so it is ready for the next build. Installation dotnet tool install --global Invex.Tools.ArtifactClean Usage Run from the root of the workspace to clean: artclean Provide a root path to clean a different directory: artclean path\\to\\workspace Options Option Description -n, --no-restore Do not run dotnet restore after cleaning. -v, --verbose Show each deleted directory and detailed dotnet output. Warning ArtifactClean permanently deletes all bin and obj directories below the selected path. It skips symbolic links and junctions while traversing the directory tree."
+  },
+  "index.html": {
+    "href": "index.html",
+    "title": "| Invex .NET Tools",
+    "summary": "window.location.replace(\"README.html\") Redirecting to documentation home..."
+  }
+}

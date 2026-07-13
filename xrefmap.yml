@@ -1,0 +1,34 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: Invex.Tools.ArtifactClean
+  name: Invex.Tools.ArtifactClean
+  href: api/Invex.Tools.ArtifactClean.html
+  commentId: N:Invex.Tools.ArtifactClean
+  fullName: Invex.Tools.ArtifactClean
+  nameWithType: Invex.Tools.ArtifactClean
+- uid: Invex.Tools.ArtifactClean.Commands
+  name: Commands
+  href: api/Invex.Tools.ArtifactClean.Commands.html
+  commentId: T:Invex.Tools.ArtifactClean.Commands
+  fullName: Invex.Tools.ArtifactClean.Commands
+  nameWithType: Commands
+- uid: Invex.Tools.ArtifactClean.Commands.Clean(System.String,System.Boolean,System.Boolean)
+  name: Clean(string?, bool, bool)
+  href: api/Invex.Tools.ArtifactClean.Commands.html#Invex_Tools_ArtifactClean_Commands_Clean_System_String_System_Boolean_System_Boolean_
+  commentId: M:Invex.Tools.ArtifactClean.Commands.Clean(System.String,System.Boolean,System.Boolean)
+  name.vb: Clean(String, Boolean, Boolean)
+  fullName: Invex.Tools.ArtifactClean.Commands.Clean(string?, bool, bool)
+  fullName.vb: Invex.Tools.ArtifactClean.Commands.Clean(String, Boolean, Boolean)
+  nameWithType: Commands.Clean(string?, bool, bool)
+  nameWithType.vb: Commands.Clean(String, Boolean, Boolean)
+- uid: Invex.Tools.ArtifactClean.Commands.Clean*
+  name: Clean
+  href: api/Invex.Tools.ArtifactClean.Commands.html#Invex_Tools_ArtifactClean_Commands_Clean_
+  commentId: Overload:Invex.Tools.ArtifactClean.Commands.Clean
+  isSpec: "True"
+  fullName: Invex.Tools.ArtifactClean.Commands.Clean
+  nameWithType: Commands.Clean
+- uid: index
+  name: index
+  href: index.html
