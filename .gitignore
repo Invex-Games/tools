@@ -399,3 +399,7 @@ FodyWeavers.xsd
 
 # VS Code
 .vscode/
+
+# DocFX generated content
+api/
+_site/
