@@ -15,6 +15,10 @@ symbolic links, junctions, and other reparse points while traversing.
 dotnet tool install --global Invex.Tools.ArtifactClean
 ```
 
+ArtifactClean requires .NET 10. Published packages include Native AOT assets
+for Windows, Linux, and macOS on x64 and ARM64. The workspaces it cleans can
+target any .NET version.
+
 ## Usage
 
 Run from the root of the workspace to clean:
