@@ -5,15 +5,11 @@
     <StripSymbols>true</StripSymbols>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>artclean</ToolCommandName>
-  </PropertyGroup>
-
-  <!-- Conditional framework version to support NuGet tool -->
-  <PropertyGroup Condition="$(RuntimeIdentifier) != ''">
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <!-- Framework-dependent tool package -->
   <PropertyGroup Condition="$(RuntimeIdentifier) == ''">
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
