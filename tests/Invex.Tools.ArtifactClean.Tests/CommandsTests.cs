@@ -326,9 +326,11 @@ internal sealed class CommandsTests
         Console.SetError(error);
 
         // Act
+        int exitCode;
+
         try
         {
-            new Commands().Clean(missing, true);
+            exitCode = new Commands().Clean(missing, true);
         }
         finally
         {
@@ -336,6 +338,8 @@ internal sealed class CommandsTests
         }
 
         // Assert
+        exitCode.ShouldBe(1);
+
         error
             .ToString()
             .ShouldContain($"Invalid or non-existent path: {missing}");
