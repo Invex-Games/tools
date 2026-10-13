@@ -27,10 +27,14 @@ public sealed class Commands
     /// <param name="path">-p, The root path to start cleaning from. [Default: Current directory]</param>
     /// <param name="noRestore">-n, If true, skips any restore operations. [Default: false]</param>
     /// <param name="verbose">-v, If true, outputs detailed information about the cleaning process. [Default: false]</param>
+    /// <returns>
+    ///     0 on success; 1 if the path is invalid, 'dotnet clean' or 'dotnet restore' fails, or a 'bin' / 'obj'
+    ///     directory could not be deleted.
+    /// </returns>
     [PublicAPI]
     [Command("")]
     [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Required by ConsoleAppFramework")]
-    public void Clean([HideDefaultValue] string? path = null, bool noRestore = false, bool verbose = false)
+    public int Clean([HideDefaultValue] string? path = null, bool noRestore = false, bool verbose = false)
     {
         path ??= Directory.GetCurrentDirectory();
 
@@ -38,22 +42,34 @@ public sealed class Commands
         {
             Console.Error.WriteLine($"Invalid or non-existent path: {path}");
 
-            return;
+            return 1;
         }
 
-        RunDotnetCommand("clean", path, verbose);
+        // Keep cleaning after a failed 'dotnet clean' so artifacts are still removed, but report the failure
+        var succeeded = RunDotnetCommand("clean", path, verbose);
 
-        // Track deleted directories across recursive calls using ref parameter
+        // Track deleted and failed directories across recursive calls using ref parameters
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
-        CleanRecursive(path, verbose, ref deletedDirectoryCount);
+        CleanRecursive(path, verbose, ref deletedDirectoryCount, ref failedDirectoryCount);
         Console.WriteLine($"Deleted {deletedDirectoryCount} 'bin' / 'obj' directories.");
 
-        if (!noRestore)
-            RunDotnetCommand("restore", path, verbose);
+        if (failedDirectoryCount > 0)
+        {
+            Console.Error.WriteLine($"Failed to delete {failedDirectoryCount} 'bin' / 'obj' directories.");
+            succeeded = false;
+        }
+
+        if (!noRestore && !RunDotnetCommand("restore", path, verbose))
+            succeeded = false;
+
+        return succeeded
+            ? 0
+            : 1;
     }
 
-    private static void RunDotnetCommand(string command, string path, bool verbose)
+    private static bool RunDotnetCommand(string command, string path, bool verbose)
     {
         var processStartInfo = new ProcessStartInfo("dotnet", command)
         {
@@ -92,12 +108,23 @@ public sealed class Commands
         process.WaitForExit();
 
         if (process.ExitCode != 0)
+        {
             Console.Error.WriteLine($"'dotnet {command}' failed with exit code {process.ExitCode}.");
-        else if (!verbose)
+
+            return false;
+        }
+
+        if (!verbose)
             Console.WriteLine($"'dotnet {command}' completed successfully.");
+
+        return true;
     }
 
-    private static void CleanRecursive(string path, bool verbose, ref int deletedDirectoryCount)
+    private static void CleanRecursive(
+        string path,
+        bool verbose,
+        ref int deletedDirectoryCount,
+        ref int failedDirectoryCount)
     {
         try
         {
@@ -123,6 +150,7 @@ public sealed class Commands
             {
                 // Use local counter for thread-safe parallel increments
                 var localDeleteCount = 0;
+                var localFailureCount = 0;
 
                 Parallel.ForEach(directoriesToDelete,
                     directory =>
@@ -139,19 +167,21 @@ public sealed class Commands
                         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                         {
                             // Always report deletion failures (unlike traversal errors, user should know)
+                            Interlocked.Increment(ref localFailureCount);
                             Console.Error.WriteLine($"Failed to delete {directory}: {ex.Message}");
                         }
                     });
 
                 // Add local count to the total
                 deletedDirectoryCount += localDeleteCount;
+                failedDirectoryCount += localFailureCount;
             }
 
             // Second pass: recurse into other directories (sequential to avoid race conditions)
             // Skip if we already marked this for deletion in first pass
             foreach (var directory in directories)
                 if (!directoriesToDelete.Contains(directory))
-                    CleanRecursive(directory, verbose, ref deletedDirectoryCount);
+                    CleanRecursive(directory, verbose, ref deletedDirectoryCount, ref failedDirectoryCount);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
