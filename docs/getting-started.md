@@ -4,7 +4,7 @@ This guide installs ArtifactClean and runs a first cleanup. It takes a couple of
 
 ## Prerequisites
 
-- The .NET 10 SDK or runtime, so the global tool can run
+- The .NET 10 SDK (`dotnet tool install`, `dotnet clean` and `dotnet restore` are SDK commands)
 - The `dotnet` command on `PATH` (ArtifactClean calls `dotnet clean` and `dotnet restore`)
 
 The workspaces you clean can target any .NET version.
