@@ -12,7 +12,8 @@
       "dest": "api",
       "properties": {
         "TargetFramework": "net10.0"
-      }
+      },
+      "filter": "docs/filterConfig.yml"
     }
   ],
   "build": {
@@ -20,16 +21,20 @@
       {
         "files": [
           "toc.yml",
-          "index.md",
-          "docs/toc.yml",
-          "docs/**/*.md"
+          "index.md"
         ]
       },
       {
         "files": [
           "api/toc.yml",
-          "api/**/*.yml",
-          "api/**/*.md"
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "docs/toc.yml",
+          "docs/**/*.md"
         ]
       }
     ],
@@ -45,7 +50,8 @@
     "globalMetadata": {
       "_appTitle": "Invex .NET Tools",
       "_appName": "Invex .NET Tools",
-      "_appFooter": "A collection of useful .NET tools for developers.",
+      "_appLogoPath": "images/icon.png",
+      "_appFooter": "Invex .NET Tools · MIT License · Invex Games",
       "_enableSearch": true,
       "_disableContribution": false,
       "_gitContribute": {
@@ -56,7 +62,9 @@
     "template": [
       "default",
       "modern"
+    ],
+    "theme": [
+      "docfx-theme"
     ]
   }
 }
-

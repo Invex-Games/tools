@@ -401,5 +401,6 @@ FodyWeavers.xsd
 .vscode/
 
 # DocFX generated content
-api/
+api/*.yml
+api/.manifest
 _site/
