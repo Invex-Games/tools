@@ -34,9 +34,12 @@ framework in the `test-framework` matrix (`net8.0` and `net10.0`):
 dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
 ```
 
-The tests exercise the bin/obj traversal against temporary directories and
-never call `dotnet clean` or `dotnet restore`. Link tests are ignored where the
-platform cannot create symbolic links.
+The tests exercise the bin/obj traversal against temporary directories. Only
+`Clean_WhenDotnetCleanFails_StillDeletesArtifactsAndReturnsFailure` calls
+`Clean` on an existing path: it runs a real `dotnet clean` in an empty
+temporary directory (so it fails) with restore disabled, which needs `dotnet`
+on `PATH`. Link tests are ignored where the platform cannot create symbolic
+links.
 
 Do not run `artclean` from the repository root during validation: it
 intentionally deletes `bin` and `obj` directories. Prefer the project and
