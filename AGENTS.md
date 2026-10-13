@@ -27,8 +27,8 @@ dotnet build Invex.Tools.slnx --configuration Release --no-restore
 ```
 
 Run the tests with `dotnet test Invex.Tools.slnx` and keep the build
-warning-free. CI runs them through the Atom `TestProjects` target once per
-framework in the `test-framework` matrix (`net8.0` and `net10.0`):
+warning-free. CI runs them on `net10.0` through the Atom `TestProjects`
+target:
 
 ```shell
 dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
