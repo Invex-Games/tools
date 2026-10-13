@@ -62,6 +62,35 @@ jobs:
           job-runs-on: ${{ matrix.job-runs-on }}
           build-slice: ${{ matrix.job-runs-on }}
 
+  TestProjects:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-framework: [ net8.0, net10.0 ]
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: TestProjects
+        id: TestProjects
+        run: dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
+        env:
+          test-framework: ${{ matrix.test-framework }}
+          build-slice: ${{ matrix.test-framework }}
+
   WaitForCopilotReview:
     runs-on: ubuntu-latest
     steps:

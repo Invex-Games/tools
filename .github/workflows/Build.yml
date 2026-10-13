@@ -70,8 +70,43 @@ jobs:
           name: 'Invex.Tools.ArtifactClean-${{ matrix.job-runs-on }}'
           path: '${{ github.workspace }}/.github/publish/Invex.Tools.ArtifactClean'
 
+  TestProjects:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-framework: [ net8.0, net10.0 ]
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: TestProjects
+        id: TestProjects
+        run: dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
+        env:
+          test-framework: ${{ matrix.test-framework }}
+          build-slice: ${{ matrix.test-framework }}
+
+      - name: Store Invex.Tools.ArtifactClean.Tests
+        uses: actions/upload-artifact@v7
+        with:
+          name: 'Invex.Tools.ArtifactClean.Tests-${{ matrix.test-framework }}'
+          path: '${{ github.workspace }}/.github/publish/Invex.Tools.ArtifactClean.Tests'
+
   PushToNuget:
-    needs: [ Pack ]
+    needs: [ TestProjects, Pack ]
     runs-on: ubuntu-latest
     steps:
 
@@ -130,7 +165,7 @@ jobs:
   PushToRelease:
     permissions:
       contents: write
-    needs: [ Pack, SetupBuildInfo ]
+    needs: [ TestProjects, Pack, SetupBuildInfo ]
     if: contains(needs.SetupBuildInfo.outputs.build-version, '-') == false
     runs-on: ubuntu-latest
     steps:

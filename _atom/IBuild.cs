@@ -32,6 +32,13 @@ internal interface IBuild : IWorkflowBuildDefinition,
 
     static readonly string[] ToolsToPack = [Projects.Invex_Tools_ArtifactClean.Name];
 
+    static readonly string[] ProjectsToTest = [Projects.Invex_Tools_ArtifactClean_Tests.Name];
+
+    static readonly string[] TestFrameworkNames =
+    [
+        WorkflowLabels.Dotnet.Framework.Net_8_0, WorkflowLabels.Dotnet.Framework.Net_10_0,
+    ];
+
     [ParamDefinition("test-framework", "Test framework to use for unit tests")]
     string TestFramework => GetParam(() => TestFramework, "net10.0");
 
@@ -83,11 +90,37 @@ internal interface IBuild : IWorkflowBuildDefinition,
                 }
             });
 
+    Target TestProjects =>
+        t => t
+            .DescribedAs("Tests the projects")
+            .RequiresParam(nameof(TestFramework))
+            .ProducesArtifacts(ProjectsToTest)
+            .Executes(async cancellationToken =>
+            {
+                var exitCode = 0;
+
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (var project in ProjectsToTest)
+                    exitCode += await DotnetTestAndStage(project,
+                        new()
+                        {
+                            TestOptions = new()
+                            {
+                                Framework = TestFramework,
+                            },
+                        },
+                        cancellationToken);
+
+                if (exitCode != 0)
+                    throw new StepFailedException("One or more unit tests failed");
+            });
+
     Target PushToNuget =>
         d => d
             .DescribedAs("Pushes packages to Nuget")
             .RequiresParam(nameof(NugetFeed), nameof(NugetApiKey))
             .ConsumesArtifacts(nameof(Pack), ToolsToPack, PlatformNames)
+            .DependsOn(nameof(TestProjects))
             .Executes(async cancellationToken =>
             {
                 // Push Atom tool package - platform-specific + multi-targeted
@@ -109,6 +142,7 @@ internal interface IBuild : IWorkflowBuildDefinition,
             .RequiresParam(nameof(GithubToken))
             .ConsumesVariable(nameof(SetupBuildInfo), nameof(BuildVersion))
             .ConsumesArtifacts(nameof(Pack), ToolsToPack, PlatformNames)
+            .DependsOn(nameof(TestProjects))
             .Executes(async () =>
             {
                 foreach (var tool in ToolsToPack)
@@ -212,6 +246,20 @@ internal interface IBuild : IWorkflowBuildDefinition,
                         },
                     ],
                 },
+                new(nameof(TestProjects))
+                {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = TestFrameworkNames,
+                        },
+                    ],
+                    Options =
+                    [
+                        BuildOptions.Target.SuppressArtifactPublishing, BuildOptions.Steps.SetupDotnet.Dotnet80X(),
+                    ],
+                },
                 new(nameof(WaitForCopilotReview))
                 {
                     Options =
@@ -247,6 +295,17 @@ internal interface IBuild : IWorkflowBuildDefinition,
                             Values = PlatformNames,
                         },
                     ],
+                },
+                new(nameof(TestProjects))
+                {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = TestFrameworkNames,
+                        },
+                    ],
+                    Options = [BuildOptions.Steps.SetupDotnet.Dotnet80X()],
                 },
                 new(nameof(PushToNuget))
                 {

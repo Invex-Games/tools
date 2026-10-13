@@ -12,8 +12,9 @@ global tool. Its `artclean` command runs `dotnet clean`, recursively removes
 unless `--no-restore` is supplied. `_atom` contains the Atom build definition
 used for CI, packaging, releases, and documentation publishing.
 
-The solution is `Invex.Tools.slnx` and currently contains the ArtifactClean
-project and the `_atom` build project. There are no test projects at present.
+The solution is `Invex.Tools.slnx` and contains the ArtifactClean project, its
+NUnit test project under `tests/Invex.Tools.ArtifactClean.Tests`, and the
+`_atom` build project.
 
 ## Build, test, and cleanup
 
@@ -25,8 +26,17 @@ dotnet restore Invex.Tools.slnx
 dotnet build Invex.Tools.slnx --configuration Release --no-restore
 ```
 
-There are currently no test projects. If tests are added, run the relevant
-project or solution with `dotnet test` and keep the build warning-free.
+Run the tests with `dotnet test Invex.Tools.slnx` and keep the build
+warning-free. CI runs them through the Atom `TestProjects` target once per
+framework in the `test-framework` matrix (`net8.0` and `net10.0`):
+
+```shell
+dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
+```
+
+The tests exercise the bin/obj traversal against temporary directories and
+never call `dotnet clean` or `dotnet restore`. Link tests are ignored where the
+platform cannot create symbolic links.
 
 Do not run `artclean` from the repository root during validation: it
 intentionally deletes `bin` and `obj` directories. Prefer the project and
@@ -114,7 +124,7 @@ prefixes:
 
 1. Follow existing patterns and make precise, surgical changes.
 2. Keep public documentation and CLI behavior accurate.
-3. Build the solution and run relevant tests, if present.
+3. Build the solution and run the tests.
 4. Run ReSharper cleanup for C# changes.
 5. Regenerate Atom workflow output when `_atom` changes affect it.
 6. Do not commit generated build artifacts or secrets.
