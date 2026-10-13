@@ -36,5 +36,12 @@ artclean --path "path/to/workspace"
 | `-n`, `--no-restore` | Do not run `dotnet restore` after cleaning. |
 | `-v`, `--verbose` | Show each deleted directory and detailed `dotnet` output. |
 
+## Exit codes
+
+The tool exits with code `0` on success and `1` when the path does not exist,
+`dotnet clean` or `dotnet restore` fails, or a `bin` or `obj` directory cannot
+be deleted. A failed `dotnet clean` does not stop the cleanup; the remaining
+steps still run and the tool reports the failure through its exit code.
+
 > [!WARNING]
 > ArtifactClean permanently deletes all `bin` and `obj` directories below the selected path. It skips symbolic links and junctions while traversing the directory tree.
