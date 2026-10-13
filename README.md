@@ -71,7 +71,7 @@ available on `PATH`.
 
 ### Supported platforms
 
-The tool targets .NET 8 and .NET 10. Published .NET 10 packages include
+The tool targets .NET 10. Published packages include
 Native AOT assets for:
 
 - Windows x64 and ARM64
