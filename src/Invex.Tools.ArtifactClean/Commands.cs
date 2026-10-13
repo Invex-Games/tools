@@ -97,7 +97,7 @@ public sealed class Commands
             Console.WriteLine($"'dotnet {command}' completed successfully.");
     }
 
-    private static void CleanRecursive(string path, bool verbose, ref int deletedDirectoryCount)
+    internal static void CleanRecursive(string path, bool verbose, ref int deletedDirectoryCount)
     {
         try
         {
