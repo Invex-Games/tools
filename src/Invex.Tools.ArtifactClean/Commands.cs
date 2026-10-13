@@ -120,7 +120,7 @@ public sealed class Commands
         return true;
     }
 
-    private static void CleanRecursive(
+    internal static void CleanRecursive(
         string path,
         bool verbose,
         ref int deletedDirectoryCount,
