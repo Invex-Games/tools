@@ -69,6 +69,11 @@ artclean [options]
 their working directory. The tool requires the `dotnet` command to be
 available on `PATH`.
 
+The tool exits with code `0` on success and `1` when the path does not exist,
+`dotnet clean` or `dotnet restore` fails, or a `bin` or `obj` directory cannot
+be deleted. A failed `dotnet clean` does not stop the cleanup; the remaining
+steps still run and the tool reports the failure through its exit code.
+
 ### Supported platforms
 
 The tool targets .NET 8 and .NET 10. Published .NET 10 packages include
