@@ -1,4 +1,4 @@
-namespace Invex.Tools.ArtifactClean.Tests;
+﻿namespace Invex.Tools.ArtifactClean.Tests;
 
 [TestFixture]
 [NonParallelizable]
@@ -44,12 +44,14 @@ internal sealed class CommandsTests
         CreateFile("src", "ProjectB", "Program.cs");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(4);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("ProjectA", "bin"))
@@ -84,12 +86,14 @@ internal sealed class CommandsTests
         CreateFile("obj", "a.obj");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(2);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("bin"))
@@ -112,12 +116,14 @@ internal sealed class CommandsTests
         CreateFile("ProjectB", "Obj", "b.obj");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(2);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("ProjectA", "BIN"))
@@ -136,12 +142,14 @@ internal sealed class CommandsTests
         CreateFile("Project", "bin", "bin", "nested.dll");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(1);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("Project", "bin"))
@@ -158,12 +166,14 @@ internal sealed class CommandsTests
         CreateFile("Project", "obj");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(0);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("binaries"))
@@ -189,12 +199,14 @@ internal sealed class CommandsTests
         CreateFile("src", "Project", "Program.cs");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(0);
+        failedDirectoryCount.ShouldBe(0);
 
         File
             .Exists(PathOf("src", "Project", "Program.cs"))
@@ -208,12 +220,14 @@ internal sealed class CommandsTests
         CreateFile("Project", "bin", "a.dll");
 
         var deletedDirectoryCount = 3;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(_root, false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(4);
+        failedDirectoryCount.ShouldBe(0);
     }
 
     [Test]
@@ -226,12 +240,14 @@ internal sealed class CommandsTests
         CreateDirectoryLink(PathOf("root", "Linked"), outside);
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(PathOf("root"), false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(PathOf("root"), false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(1);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("root", "Project", "obj"))
@@ -251,12 +267,14 @@ internal sealed class CommandsTests
         CreateDirectoryLink(PathOf("root", "Project", "bin"), target);
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
 
         // Act
-        Commands.CleanRecursive(PathOf("root"), false, ref deletedDirectoryCount);
+        Commands.CleanRecursive(PathOf("root"), false, ref deletedDirectoryCount, ref failedDirectoryCount);
 
         // Assert
         deletedDirectoryCount.ShouldBe(0);
+        failedDirectoryCount.ShouldBe(0);
 
         Directory
             .Exists(PathOf("root", "Project", "bin"))
@@ -274,6 +292,7 @@ internal sealed class CommandsTests
         CreateFile("Project", "bin", "a.dll");
 
         var deletedDirectoryCount = 0;
+        var failedDirectoryCount = 0;
         using var output = new StringWriter();
         var originalOut = Console.Out;
         Console.SetOut(output);
@@ -281,7 +300,7 @@ internal sealed class CommandsTests
         // Act
         try
         {
-            Commands.CleanRecursive(_root, true, ref deletedDirectoryCount);
+            Commands.CleanRecursive(_root, true, ref deletedDirectoryCount, ref failedDirectoryCount);
         }
         finally
         {
@@ -290,6 +309,7 @@ internal sealed class CommandsTests
 
         // Assert
         deletedDirectoryCount.ShouldBe(1);
+        failedDirectoryCount.ShouldBe(0);
 
         output
             .ToString()
@@ -297,7 +317,7 @@ internal sealed class CommandsTests
     }
 
     [Test]
-    public void Clean_WithNonExistentPath_ReportsErrorAndDeletesNothing()
+    public void Clean_WithNonExistentPath_ReportsErrorAndReturnsFailure()
     {
         // Arrange
         var missing = PathOf("missing");
@@ -323,6 +343,39 @@ internal sealed class CommandsTests
         Directory
             .Exists(missing)
             .ShouldBeFalse();
+    }
+
+    [Test]
+    public void Clean_WhenDotnetCleanFails_StillDeletesArtifactsAndReturnsFailure()
+    {
+        // Arrange - no project or solution here, so 'dotnet clean' exits non-zero
+        CreateFile("Project", "bin", "a.dll");
+
+        using var output = new StringWriter();
+        using var error = new StringWriter();
+        var originalOut = Console.Out;
+        var originalError = Console.Error;
+        Console.SetOut(output);
+        Console.SetError(error);
+
+        // Act
+        int exitCode;
+
+        try
+        {
+            exitCode = new Commands().Clean(_root, true);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+            Console.SetError(originalError);
+        }
+
+        // Assert
+        exitCode.ShouldBe(1);
+        error.ToString().ShouldContain("'dotnet clean' failed with exit code");
+        output.ToString().ShouldContain("Deleted 1 'bin' / 'obj' directories.");
+        Directory.Exists(PathOf("Project", "bin")).ShouldBeFalse();
     }
 
     private string PathOf(params string[] parts) =>
