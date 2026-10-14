@@ -1,5 +1,10 @@
 ﻿namespace Invex.Tools.ArtifactClean;
 
+/// <summary>
+///     The <c>artclean</c> command set registered with ConsoleAppFramework, which cleans a .NET workspace by running
+///     <c>dotnet clean</c>, deleting every <c>bin</c> and <c>obj</c> directory, and optionally running
+///     <c>dotnet restore</c>.
+/// </summary>
 public sealed class Commands
 {
     private static readonly EnumerationOptions EnumerationOptions = new()

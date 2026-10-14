@@ -74,9 +74,11 @@ Cleanup honors `.editorconfig` and any repository DotSettings automatically.
 - Follow the existing analyzer-driven style, including `var` where the type is
   apparent, target-typed `new`, collection expressions, and trailing commas in
   multiline lists.
-- Public types and members should have accurate XML documentation, even though
-  CS1591 is suppressed. Add `[PublicAPI]` to new public API where the existing
-  public-API analyzer conventions require it.
+- Public types and members must have accurate XML documentation; `CS1591` is
+  enforced in Release builds (where the documentation file is generated). Only
+  the non-shipped `_atom` build project suppresses it, in its own `.csproj`. Add
+  `[PublicAPI]` to new public API where the existing public-API analyzer
+  conventions require it.
 - Keep internal helpers `internal`; expose only the intended consumer surface.
 - Preserve Native AOT compatibility. Avoid reflection and platform-specific
   APIs unless all configured runtime identifiers support them.
@@ -122,6 +124,23 @@ prefixes:
 | `feat:`, `feature:`, or `minor:` | Minor |
 | `fix:` or `patch:` | Patch |
 | `semver-none` or `semver-skip` | No version bump |
+
+## Documentation
+
+Docs follow the shared Invex documentation standard used by every Invex library:
+
+- **README.md** is also the NuGet readme. Keep the fixed section order (title, badges, pitch, Features,
+  Installation, Quick start, Usage, Documentation, Development, License) and use absolute links only
+  (`https://github.com/Invex-Games/tools/blob/main/...` or the docs site), so they work on nuget.org.
+- **DocFX site** (`docfx.json`, `toc.yml`, `index.md`, `docs/`, `api/index.md`), published to
+  https://invex-games.github.io/tools/. `docs/introduction.md` and `docs/getting-started.md` come first; every page
+  opens with one to three sentences on what it covers and ends with a "See also" or "Next steps" list. Link API
+  types with `<xref:Namespace.Type>`, not file paths.
+- **`api/index.md`** is the only hand-written file under `api/`; everything else there is generated. Put per-type
+  detail in XML docs, not in hand-written API pages.
+- **XML docs are enforced.** `CS1591` is not suppressed for shipped projects, so every public type and member needs
+  `<summary>`, plus `<param>`, `<typeparam>`, `<returns>` and `<exception>` where they apply, `<remarks>` for
+  non-obvious behaviour, and `<see cref>`/`<paramref>`/`<see langword>` for references.
 
 ## Change checklist
 
