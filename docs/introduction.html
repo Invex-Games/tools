@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Introduction | Invex .NET Tools </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Introduction | Invex .NET Tools ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Invex-Games/tools/blob/main/docs/introduction.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/icon.png" alt="Invex .NET Tools">
+            Invex .NET Tools
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="introduction">Introduction</h1>
+
+<p>Invex .NET Tools is a home for small, single-purpose command-line tools that the Invex team uses while
+developing .NET code. Each tool is published as its own .NET global tool package. Today the repository ships one
+tool, ArtifactClean (<code>artclean</code>).</p>
+<h2 id="what-it-is">What it is</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Command</th>
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ArtifactClean</td>
+<td><code>artclean</code></td>
+<td><code>Invex.Tools.ArtifactClean</code></td>
+<td>Reset a .NET workspace: <code>dotnet clean</code>, delete <code>bin</code> / <code>obj</code>, <code>dotnet restore</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="when-to-use-artifactclean">When to use ArtifactClean</h2>
+<ul>
+<li>Builds behave strangely after switching branches, SDKs or target frameworks, and <code>dotnet clean</code> alone does not
+help because stale files sit in <code>obj</code> (for example <code>project.assets.json</code> or generated sources).</li>
+<li>You want to free disk space taken by build output across many projects under one folder.</li>
+<li>You want a repeatable &quot;clean slate&quot; step in a local script, with an exit code that says whether it worked.</li>
+</ul>
+<h3 id="when-not-to-use-it">When not to use it</h3>
+<ul>
+<li><strong>To clean a single project in place.</strong> <code>dotnet clean</code> (or deleting that one <code>bin</code> / <code>obj</code> folder) is enough.</li>
+<li><strong>When <code>bin</code> or <code>obj</code> holds something you need.</strong> The tool deletes every directory with those names, case-insensitively,
+below the root, including ones that are not build output.</li>
+<li><strong>On a directory you did not mean to select.</strong> There is no confirmation prompt and deletion is permanent; prefer
+<code>--path</code> with an explicit workspace root in scripts.</li>
+</ul>
+<h2 id="key-concepts-at-a-glance">Key concepts at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Root path</strong></td>
+<td>The directory passed with <code>--path</code>, or the current directory. All three steps run against it.</td>
+</tr>
+<tr>
+<td><strong>Artifact directory</strong></td>
+<td>Any directory named <code>bin</code> or <code>obj</code> (any casing) below the root. It is deleted with all of its contents.</td>
+</tr>
+<tr>
+<td><strong>Reparse point</strong></td>
+<td>A symbolic link, junction or similar. The tool never follows one, so it cannot escape the root or loop.</td>
+</tr>
+<tr>
+<td><strong>Exit code</strong></td>
+<td><code>0</code> when every step succeeded, <code>1</code> otherwise.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="design-principles">Design principles</h2>
+<ul>
+<li><strong>Do one job well.</strong> Each tool covers one routine task with as few options as possible.</li>
+<li><strong>Keep going, then report.</strong> A failing step does not abort the rest; the failure shows up in the output and the exit code.</li>
+<li><strong>Stay inside the root.</strong> Links and junctions are skipped so a cleanup never reaches outside the selected tree.</li>
+<li><strong>Quiet by default.</strong> Normal runs print a short summary; detail is opt-in with <code>--verbose</code>.</li>
+<li><strong>Start fast.</strong> Packages include Native AOT builds so a short-lived command does not pay JIT start-up cost.</li>
+</ul>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="getting-started.html">Getting Started</a></li>
+<li><a href="artifactclean.html">ArtifactClean</a></li>
+</ul>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Invex-Games/tools/blob/main/docs/introduction.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Invex .NET Tools · MIT License · Invex Games
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
