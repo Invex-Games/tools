@@ -14,7 +14,8 @@ used for CI, packaging, releases, and documentation publishing.
 
 The solution is `Invex.Tools.slnx` and contains the ArtifactClean project, its
 NUnit test project under `tests/Invex.Tools.ArtifactClean.Tests`, and the
-`_atom` build project.
+`_atom` build project. The tool targets `net10.0` only, because a second target framework collides with the
+Native AOT tool packages (NU5118); the test project targets `net10.0` and `net11.0`.
 
 ## Build, test, and cleanup
 
@@ -27,7 +28,7 @@ dotnet build Invex.Tools.slnx --configuration Release --no-restore
 ```
 
 Run the tests with `dotnet test Invex.Tools.slnx` and keep the build
-warning-free. CI runs them on `net10.0` through the Atom `TestProjects`
+warning-free. CI runs them on `net10.0` and `net11.0` through the Atom `TestProjects`
 target:
 
 ```shell

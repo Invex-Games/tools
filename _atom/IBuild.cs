@@ -34,6 +34,12 @@ internal interface IBuild : IWorkflowBuildDefinition,
 
     static readonly string[] ProjectsToTest = [Projects.Invex_Tools_ArtifactClean_Tests.Name];
 
+    static readonly string[] TestFrameworkNames =
+    [
+        WorkflowLabels.Dotnet.Framework.Net_10_0,
+        "net11.0",
+    ];
+
     [ParamDefinition("test-framework", "Test framework to use for unit tests")]
     string TestFramework => GetParam(() => TestFramework, "net10.0");
 
@@ -245,6 +251,13 @@ internal interface IBuild : IWorkflowBuildDefinition,
                 },
                 new(nameof(TestProjects))
                 {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = [..TestFrameworkNames],
+                        },
+                    ],
                     Options = [BuildOptions.Target.SuppressArtifactPublishing],
                 },
                 new(nameof(WaitForCopilotReview))
@@ -283,7 +296,16 @@ internal interface IBuild : IWorkflowBuildDefinition,
                         },
                     ],
                 },
-                new(nameof(TestProjects)),
+                new(nameof(TestProjects))
+                {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = [..TestFrameworkNames],
+                        },
+                    ],
+                },
                 new(nameof(PushToNuget))
                 {
                     Options = [BuildOptions.Inject.Secret(nameof(NugetApiKey))],
