@@ -34,6 +34,12 @@ internal interface IBuild : IWorkflowBuildDefinition,
 
     static readonly string[] ProjectsToTest = [Projects.Invex_Tools_ArtifactClean_Tests.Name];
 
+    static readonly string[] TestFrameworkNames =
+    [
+        WorkflowLabels.Dotnet.Framework.Net_10_0,
+        WorkflowLabels.Dotnet.Framework.Net_11_0,
+    ];
+
     [ParamDefinition("test-framework", "Test framework to use for unit tests")]
     string TestFramework => GetParam(() => TestFramework, "net10.0");
 
@@ -220,6 +226,8 @@ internal interface IBuild : IWorkflowBuildDefinition,
         BuildOptions.GitVersion.ProvideBuildId,
         BuildOptions.GitVersion.ProvideBuildVersion,
         BuildOptions.Steps.SetupDotnet.Dotnet100X(),
+        // .NET 11 SDK. The .NET 10 step above still provides the runtime for net10.0 tests.
+        BuildOptions.Steps.SetupDotnet.Dotnet110X(),
     ];
 
     IReadOnlyList<WorkflowDefinition> IWorkflowBuildDefinition.Workflows =>
@@ -243,6 +251,13 @@ internal interface IBuild : IWorkflowBuildDefinition,
                 },
                 new(nameof(TestProjects))
                 {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = [..TestFrameworkNames],
+                        },
+                    ],
                     Options = [BuildOptions.Target.SuppressArtifactPublishing],
                 },
                 new(nameof(WaitForCopilotReview))
@@ -281,7 +296,16 @@ internal interface IBuild : IWorkflowBuildDefinition,
                         },
                     ],
                 },
-                new(nameof(TestProjects)),
+                new(nameof(TestProjects))
+                {
+                    MatrixDimensions =
+                    [
+                        new(nameof(TestFramework))
+                        {
+                            Values = [..TestFrameworkNames],
+                        },
+                    ],
+                },
                 new(nameof(PushToNuget))
                 {
                     Options = [BuildOptions.Inject.Secret(nameof(NugetApiKey))],

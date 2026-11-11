@@ -28,6 +28,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Setup .NET 11.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+
       - name: SetupBuildInfo
         id: SetupBuildInfo
         run: dotnet run --project _atom/_atom.csproj -- SetupBuildInfo --skip --headless
@@ -55,6 +60,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Setup .NET 11.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+
       - name: Pack
         id: Pack
         run: dotnet run --project _atom/_atom.csproj -- Pack --skip --headless
@@ -64,6 +74,9 @@ jobs:
 
   TestProjects:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-framework: [ net10.0, net11.0 ]
     steps:
 
       - name: Checkout
@@ -76,9 +89,17 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Setup .NET 11.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+
       - name: TestProjects
         id: TestProjects
         run: dotnet run --project _atom/_atom.csproj -- TestProjects --skip --headless
+        env:
+          test-framework: ${{ matrix.test-framework }}
+          build-slice: ${{ matrix.test-framework }}
 
   WaitForCopilotReview:
     runs-on: ubuntu-latest
@@ -93,6 +114,11 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+
+      - name: Setup .NET 11.0.x
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
 
       - name: WaitForCopilotReview
         id: WaitForCopilotReview
