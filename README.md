@@ -98,7 +98,7 @@ Full documentation: [https://invex-games.github.io/tools/](https://invex-games.g
 
 ## Development
 
-The repository requires the .NET 10 SDK (see `global.json`).
+The repository requires the .NET 11 SDK (see `global.json`), plus the .NET 10 runtime (or SDK) for the `net10.0` projects. Tests run on `net10.0` and `net11.0`.
 
 ```shell
 dotnet build Invex.Tools.slnx
